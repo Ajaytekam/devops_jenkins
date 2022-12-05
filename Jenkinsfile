@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         maven "MAVEN3"
-        jdk "OpenJDK8"
+        jdk "OpenJDK11"
     }
 
     stages {
@@ -35,6 +35,12 @@ pipeline {
                     echo 'Now archiving it...'
                     archiveArtifacts artifacts: '**/target/*.war'
                 }
+            }
+        }
+
+        stage('Checkstyle Analysis') {
+            steps {
+                sh 'mvn checkstyle:checkstyle'
             }
         }
 
