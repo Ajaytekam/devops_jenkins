@@ -76,7 +76,29 @@ pipeline {
                     // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
                     // true = set pipeline to UNSTABLE, false = don't
                     //waitForQualityGate abortPipeline: true
-                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-api'  
+                    waitForQualityGate abortPipeline: true, credentialsId: 'sonar-api'  
+                }
+            }
+        }
+
+        stage('Upload war file to nexus') {
+            steps{
+                script{
+                    nexusArtifactUploader artifacts: [
+                        [
+                            artifactId: 'vprofile', 
+                            classifier: '', 
+                            file: 'target/vprofile-v2.warwar', 
+                            type: 'war'
+                        ]
+                    ], 
+                    credentialsId: 'nexus-auth', 
+                    groupId: 'com.visualpathit', 
+                    nexusUrl: '172.31.9.55:8081', 
+                    nexusVersion: 'nexus3', 
+                    protocol: 'http', 
+                    repository: 'vprofile-app-release', 
+                    version: 'v2'
                 }
             }
         }
