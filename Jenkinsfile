@@ -25,8 +25,8 @@ pipeline {
                 sh 'mvn clean install -DskipTests'
             }
 
-            success {
-                post {
+             post {
+                success {
                     echo 'Now archiving it...'
                     archiveArtifacts artifacts: '**/target/*.war'i
                 }
