@@ -1,10 +1,28 @@
 pipeline {
-    master any
+    agent any
 
     stages {
         stage('Git Checkout') {
             steps {
-                git branch: 'vp-rem', url: 'https://github.com/devopshydclub/vprofile-project.git'
+                git branch: 'main', url: 'https://github.com/Ajaytekam/devops_jenkins.git'
+            }
+        }
+
+        stage('Unit Testing') {
+            steps{
+                sh 'mvn test'
+            }
+        }
+
+        stage('Integration Testing') {
+            steps{
+                sh 'mvn verify -DskipUnitTests'  
+            }
+        }
+
+        stage('Maven Build') {
+            steps{
+                sh 'mvn clean install'
             }
         }
     }

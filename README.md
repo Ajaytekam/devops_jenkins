@@ -5,18 +5,18 @@
 Deploy Scripts :  
 
 * Jenkins Instance 
-    * [Jenkins.sh](Jenkins.sh)     
+    * [Jenkins.sh](userData/Jenkins.sh)     
     * OS: Ubuntu22 | ImageID: ami-07ffb2f4d65357b42 
     * Type: t2.small
     * Security Group Settings : Port 80,8080 needs to be accessible  
     * Install Plugins : Sonar Gerrit plugin, SonarQube Scanner for jenkins, SonarQube generic Coverage plugin, Sonar Quality Gates Plugin, Nexus Artifact Uploader, Git Plugin, Pipeline Maven Integration, Build TimeStamp   
 * SonarQube Instance 
-    * [SonarQube.sh](SonarQube.sh)     
+    * [SonarQube.sh](userData/SonarQube.sh)     
     * OS: Ubuntu22 | ImageID: ami-07ffb2f4d65357b42 
     * Type: t2.medium
     * Security Group Settings : Port 80,9000 needs to be accessible    
 * Nexus Instance   
-    * [Nexus.sh](Nexus.sh)    
+    * [Nexus.sh](userData/Nexus.sh)    
     * OS: CentOS7 | ImageID: ami-0763cf792771fe1bd
     * Type: t2.medium   
     * Security Group Settings : Port 8081 needs to be accessible    
