@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         maven "MAVEN3"
-        jdk "OpenJDK11"
+        jdk "OpenJDK8"
     }
 
     stages {
@@ -15,7 +15,7 @@ pipeline {
 
         stage('Unit Testing') {
             steps{
-                sh 'mvn -X test'
+                sh 'mvn test'
             }
         }
 
@@ -54,7 +54,8 @@ pipeline {
                 script {
                     withSonarQubeEnv(credentialsId: 'sonar-api') {
                         //sh 'mvn clean package sonar:sonar'
-                        sh '''${scannerHome}/bin/sonar-scanner -X \
+                        sh '''export JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64;
+                        ${scannerHome}/bin/sonar-scanner -X \
                         -Dsonar.projectKey=vprofile \
                         -Dsonar.projectName=vprofile \
                         -Dsonar.projectVersion=1.0 \
