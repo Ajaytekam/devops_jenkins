@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    tools {
+        maven "MAVEN3"
+        jdk "OracleJDK8"
+    }
+
     stages {
         stage('Git Checkout') {
             steps {
@@ -21,11 +26,11 @@ pipeline {
         }
 
         stage('Maven Build') {
-            steps{
+            steps {
                 sh 'mvn clean install -DskipTests'
             }
 
-             post {
+            post {
                 success {
                     echo 'Now archiving it...'
                     archiveArtifacts artifacts: '**/target/*.war'i
