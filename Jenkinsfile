@@ -97,7 +97,7 @@ pipeline {
                     nexusUrl: '172.31.9.55:8081', 
                     nexusVersion: 'nexus3', 
                     protocol: 'http', 
-                    repository: 'new-repo-release', 
+                    repository: 'vprofile-release', 
                     version: 'v2'
                 }
             }
