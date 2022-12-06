@@ -86,7 +86,7 @@ pipeline {
                 script{
                     nexusArtifactUploader artifacts: [
                         [
-                            artifactId: 'v2', 
+                            artifactId: 'vprofile', 
                             classifier: '', 
                             file: 'target/vprofile-v2.war', 
                             type: 'war'
