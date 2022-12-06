@@ -86,19 +86,19 @@ pipeline {
                 script{
                     nexusArtifactUploader artifacts: [
                         [
-                            artifactId: 'vprofile', 
+                            artifactId: 'v2', 
                             classifier: '', 
                             file: 'target/vprofile-v2.war', 
                             type: 'war'
                         ]
                     ], 
-                    credentialsId: 'nexus-auth', 
+                    credentialsId: 'nexus-auth2', 
                     groupId: 'com.visualpathit', 
                     nexusUrl: '172.31.9.55:8081', 
                     nexusVersion: 'nexus3', 
                     protocol: 'http', 
-                    repository: 'vprofile-release', 
-                    version: 'v2.1'
+                    repository: 'new-repo-release', 
+                    version: 'v2'
                 }
             }
         }
