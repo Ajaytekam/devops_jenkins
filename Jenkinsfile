@@ -98,7 +98,7 @@ pipeline {
                     nexusVersion: 'nexus3', 
                     protocol: 'http', 
                     repository: 'vprofile-release', 
-                    version: 'v2'
+                    version: 'v2.1'
                 }
             }
         }
