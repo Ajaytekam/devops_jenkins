@@ -101,15 +101,15 @@ pipeline {
                     //  repository: 'new-repo-release', 
                     //  version: "v2"
 
-                    def readPomVersion = readMavenPom file: 'pom.xml' 
-                    def buildVar = readPomVersion.version
-                    def artifectId = readPomVersion.artifactId
-                    def packaging = readPomVersion.packaging 
+                    def version = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
+                    def artifactId = sh script: 'mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout', returnStdout: true
+                    def packaging = sh script: 'mvn help:evaluate -Dexpression=project.packaging -q -DforceStdout', returnStdout: true
+
                     nexusArtifactUploader artifacts: [
                         [
                             artifactId: "${artifactId}", 
                             classifier: '', 
-                            file: "target/${artifactId}-${buildVar}.war",
+                            file: "target/${artifactId}-${version}.war",
                             type: "${packaging}"
                         ]
                     ], 
@@ -119,7 +119,7 @@ pipeline {
                     nexusVersion: 'nexus3', 
                     protocol: 'http', 
                     repository: 'new-repo-release', 
-                    version: "${buildVar}"
+                    version: "${version}"
                 }
             }
         }
