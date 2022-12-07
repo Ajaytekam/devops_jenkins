@@ -85,14 +85,32 @@ pipeline {
             steps{
                 script{
 
+                    //  nexusArtifactUploader artifacts: [
+                    //    [
+                    //      artifactId: 'vprofile', 
+                    //      classifier: '', 
+                    //      file: "target/vprofile-v2.war", 
+                    //      type: 'war'
+                    //    ]
+                    //  ], 
+                    //  credentialsId: 'nexus-auth2', 
+                    //  groupId: 'com.visualpathit', 
+                    //  nexusUrl: '172.31.9.55:8081', 
+                    //  nexusVersion: 'nexus3', 
+                    //  protocol: 'http', 
+                    //  repository: 'new-repo-release', 
+                    //  version: "v2"
+
                     def readPomVersion = readMavenPom file: 'pom.xml' 
                     def buildVar = readPomVersion.version
+                    def artifectId = readPomVersion.artifactId
+                    def packaging = readPomVersion.packaging 
                     nexusArtifactUploader artifacts: [
                         [
-                            artifactId: 'vprofile', 
+                            artifactId: "${artifactId}", 
                             classifier: '', 
-                            file: "target/vprofile-${buildVar}.war", 
-                            type: 'war'
+                            file: "target/${artifactId}-${buildVar}.war",
+                            type: "${packaging}"
                         ]
                     ], 
                     credentialsId: 'nexus-auth2', 
