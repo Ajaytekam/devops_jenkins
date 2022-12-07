@@ -61,6 +61,7 @@ __Global Tool Configuration :__
 * Create quality Gate 
     * Goto `Quality Gates` click on `Create Quality Gate`, assign a name 
     * Add condition and choose a matrix like `Bugs` and condition like greater then 60  
+* Configure webhook api with secret 
 
 ## Step 3. Confiurating Nexus and Jenkins 
 
@@ -68,4 +69,11 @@ __Global Tool Configuration :__
 
 [Jenkinsfile](Jenkinsfile)  
 
-## Step 5.     
+## Step 5. Implementing Pipeline utility for dynamic versioning 
+
+* Read the version in pom.xml and push builds according to that in nexus repository management.  
+* Check for snapshot version and put the build on snapshot repo in nexus repository management.  
+* Setting nexus repo push code dynamic in Jenkinsfile 
+
+## Step 6. Creatiing Multi Container Docker Setup
+
