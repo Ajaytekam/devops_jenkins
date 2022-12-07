@@ -86,11 +86,12 @@ pipeline {
                 script{
 
                     def readPomVersion = readMavenPom file: 'pom.xml' 
+                    def buildVar = readPomVersion.version
                     nexusArtifactUploader artifacts: [
                         [
                             artifactId: 'vprofile', 
                             classifier: '', 
-                            file: 'target/vprofile-v2.war', 
+                            file: "target/vprofile-${buildVar}.war", 
                             type: 'war'
                         ]
                     ], 
@@ -100,7 +101,7 @@ pipeline {
                     nexusVersion: 'nexus3', 
                     protocol: 'http', 
                     repository: 'new-repo-release', 
-                    version: "${readPomVersion.version}"
+                    version: "${buildVar}"
                 }
             }
         }
