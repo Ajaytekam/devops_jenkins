@@ -77,5 +77,38 @@ __Global Tool Configuration :__
 
 > Note i have tried the Pipeline utilities, but there are some problem, so for Pom.xml read/write use the mvn commandline version.   
 
-## Step 6. Creatiing Multi Container Docker Setup
+
+# Setp 6. Setup Slack Notification    
+
+* Install Slake   
+* Create a new workspace, example `DevOpsCICD`    
+* Create a new channel under that workspace, you can also add users emails which you want to include in the channel.   
+* Goto `https://api.slack.com/apps` and search `Jenkins CI` app, install it and on the settings page select the chennal name, copy the API_KEY and save the settings.   
+* At Jenkins install slack notification plugin  
+* Configure Slake plugin `Manage Jenkins > Configure System` look for slake settings  
+    * On workspace put the workspace name. Also note that you need to put the name from the slake url example if url is devops-network.slake.com then put devops-network not just devops.  
+    * Set credentials 
+    * Set chennal neme for example `#jenkinscicd` test connection and apply and save settings.  
+* Now we have to put the below code into the Jenkinsfile to send the notification to our slack channel  
+
+```
+// Put the below code on the top of the page, outside the pipelines block 
+def COLOR_MAP = [
+    'SUCCESS': 'good',
+    'FAILURE': 'danger'
+]
+
+// Now put the below code after the stages block inside pipelines itself
+post {
+    always {
+        echo 'Slack Notification.'
+        slackSend channel: '#jenkinscicd',
+            color: COLOR_MAP[currentBuild.currentResult],
+            message: "*${currentBuild.currentResult}* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \n More info at: ${env.BUILD_URL}"
+
+    }
+}
+```
+
+## Step 7. Creatiing Multi Container Docker Setup
 
