@@ -12,6 +12,12 @@ pipeline {
     }
 
     stages {
+        stage('Generate errors') {
+            steps{
+                sh 'fake command'
+            }
+        }
+
         stage('Git Checkout') {
             steps {
                 git branch: 'Dev', url: 'https://github.com/Ajaytekam/devops_jenkins.git'
