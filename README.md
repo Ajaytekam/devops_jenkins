@@ -75,5 +75,7 @@ __Global Tool Configuration :__
 * Check for snapshot version and put the build on snapshot repo in nexus repository management.  
 * Setting nexus repo push code dynamic in Jenkinsfile 
 
+> Note i have tried the Pipeline utilities, but there are some problem, so for Pom.xml read/write use the mvn commandline version.   
+
 ## Step 6. Creatiing Multi Container Docker Setup
 
