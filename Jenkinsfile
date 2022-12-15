@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Git Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Ajaytekam/devops_jenkins.git'
+                git branch: 'Dev', url: 'https://github.com/Ajaytekam/devops_jenkins.git'
             }
         }
 
@@ -81,25 +81,10 @@ pipeline {
             }
         }
 
+
         stage('Upload war file to nexus') {
             steps{
                 script{
-
-                    //  nexusArtifactUploader artifacts: [
-                    //    [
-                    //      artifactId: 'vprofile', 
-                    //      classifier: '', 
-                    //      file: "target/vprofile-v2.war", 
-                    //      type: 'war'
-                    //    ]
-                    //  ], 
-                    //  credentialsId: 'nexus-auth2', 
-                    //  groupId: 'com.visualpathit', 
-                    //  nexusUrl: '172.31.9.55:8081', 
-                    //  nexusVersion: 'nexus3', 
-                    //  protocol: 'http', 
-                    //  repository: 'new-repo-release', 
-                    //  version: "v2"
 
                     def version = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
                     def artifactId = sh script: 'mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout', returnStdout: true
@@ -119,7 +104,8 @@ pipeline {
                     nexusVersion: 'nexus3', 
                     protocol: 'http', 
                     repository: 'new-repo-release', 
-                    version: "${version}"
+                    version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}-${version}"
+
                 }
             }
         }
