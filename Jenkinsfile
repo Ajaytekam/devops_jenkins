@@ -18,11 +18,6 @@ pipeline {
     }
 
     stages {
-        stage('Generate errors') {
-            steps{
-                sh 'fake command'
-            }
-        }
 
         stage('Git Checkout') {
             steps {
