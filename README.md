@@ -112,3 +112,139 @@ post {
 
 ## Step 7. Creatiing Multi Container Docker Setup
 
+__Objective :__ 
+
+* Build docker image
+* Push it to the ECR registry.    
+* Deply the docker image into the ECS service.      
+
+__Things Needs to be setup :__     
+
+* Install docker engine on Jenkins server     
+    * Add jenkins user to docker group and reboot   
+* Install aws cli  
+* Create IAM user with ECR permission   
+* Create ECR repos in aws   
+* Store aws credentials in jenkins    
+* Plugins to install :    
+    * docker pipeline   
+    * aws ecr plugin    
+    * aws sdk for credentials    
+* Run the pipeline    
+
+__Code samples for the Jenkinsfile pipeline :__   
+
+* Code for setting up global environment variables in Jenkinsfile :   
+
+```    
+environment {
+    registryCredential = 'ecr:regioncode:CredentialIDinJenkins'
+    appRegistry = "RegistryURL/RegistryNAME"
+    vprofileRegistry = "RegistryURL"   
+}
+```    
+
+The above code needs to be in the beginning of the jenkinsfile pipline block.   
+
+* Code to build the images  
+
+```
+stage('Build App Image') {
+    steps {
+        script {
+            dockerImage = docker.build(appRegistry + ":$BUILD_NUMBER", "Dockerfile_PATH")
+        }
+    }
+}
+```
+
+Put the above code after all the build process.  
+
+Code for the dockerfile which is used to compile the vprofile sample project used through the course :     
+
+```
+FROM openjdk:8 AS BUILD_IMAGE
+RUN apt update && apt install maven -y
+RUN git clone -b vp-docker https://github.com/imranvisualpath/vprofile-repo.git
+RUN cd vprofile-repo && mvn install
+
+FROM tomcat:8-jre11
+
+RUN rm -rf /usr/local/tomcat/webapps/*
+
+COPY --from=BUILD_IMAGE vprofile-repo/target/vprofile-v2.war /usr/local/tomcat/webapps/ROOT.war
+
+EXPOSE 8080
+CMD ["catalina.sh", "run"]
+```
+
+* Code to upload the built docker images 
+
+```
+stage('Upload app image') {
+    steps {
+        script {
+            docker.withRegistry( vprofileRegistry, registryCredential ) {
+                dockerImage.push("$BUILD_NUMBER")    
+                dockerImage.push("latest")   
+            }
+        }
+    }
+}
+```   
+
+__Steps :__   
+
+1. Installing docker engine and aws cli in jenkins server  
+
+```
+# docker installation  
+$ apt-get update -y  
+$ apt-get install ca-certificates curl gnupg lsb-release -y  
+$ mkdir -p /etc/apt/keyrings   
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg  
+$ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+$ chmod a+r /etc/apt/keyrings/docker.gpg   
+$ apt update -y
+apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y  
+$ usermod -aG docker jenkins
+
+# aws cli installation  
+$ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"   
+$ sudo apt install unzip     
+$ unzip awscliv2.zip    
+$ ./aws/install 
+```   
+
+2. Create new IAM user with below policies :
+
+* AmazonEC2ContainerRegistryFullAccess 
+* AmazonECS_FullAccess  
+
+3. Install plugins 
+
+* docker pipeline
+* amazon ecr 
+* Amazon Web Services SDK :: All  
+* CloudBees Docker Build and PublishVersion  
+
+4. Create ECR registry
+
+* Goto ecr console give a tag name like `vprofileimg`, click create and save and note down the url.   
+
+5. Set aws credential
+
+* Goto `Manage Jenkins > Credentials' and add new global credentials and select `aws credentials` kind, provide access key and secret key, give a name like awscreds and save.  
+
+
+6. Add aws credentials to Jenkinsfile environment variable 
+
+```    
+environment {    
+    registryCredential = 'ecr:ap-south-1:awscreds'    
+    appRegistry = "897003471175.dkr.ecr.ap-south-1.amazonaws.com/vprofileappimg"   
+    vprofileRegistry = "https://897003471175.dkr.ecr.ap-south-1.amazonaws.com"   
+}   
+```   
+
+
