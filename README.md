@@ -110,7 +110,7 @@ post {
 }
 ```
 
-## Step 7. Creatiing Multi Container Docker Setup
+## Step 7. Creatiing Docker Image amd Push it into AWS ECR  
 
 __Objective :__ 
 
@@ -246,5 +246,72 @@ environment {
     vprofileRegistry = "https://897003471175.dkr.ecr.ap-south-1.amazonaws.com"   
 }   
 ```   
+
+7. Put the dockerfile location in the Jenkins Image build process  
+
+```   
+stage('Build App Image') {
+    steps {
+        script {
+            dockerImage = docker.build(appRegistry + ":$BUILD_NUMBER", ".")
+        }
+    }
+}
+```  
+
+> Note: You only have to put the Dockerfile path in your gihub repo not the Dockerfile name itself. Otherwise it will not work. At above example the laset "." represnts that the Dockerfile is in the git repository.   
+
+### Step 8. Deploy Docker Image tyo ECS system   
+
+Some of the docker container hosting platforms are :
+
+* Using docker engine (very much used for local testing and developmentt environment)  
+* kubernetes 
+    * Standalone kubernetes service, EKS (AWS), AKS (Azure), GKE(GCP), OpenShift (redhat) etc.   
+
+__Steps to setting up ECS service :__   
+
+1. Create an ECS cluster, choose `AWS Fargate (serverless)` as infrastructure, enable `Use Container Insights` in monitoring section and click on create button. For example `vprofile`   
+2. Create Task definition: 
+    * For example `vprofileTask` and fillup container details (container name and container url from ecr), set the container service port for example 8080 for tomcat.       
+    * In next page you can change the App environment, hardware specification etc.  
+    * In next page you can review the specification and click on `Create` button.   
+    * Also note that this step only create the task definition, and does not create task itiself, To create the task we have to combine the cluster with task definition and create a service in the cluster
+    * Now to combine task definition with cluster, we need to create service in cluster. For that goto services tab and click on `create`
+    * At `Service Creation` in `Deployment Configuration` choose "Application type" as service, select the task definition name in "Family", set a service name for example "vprofileappsvc", set the number of desired task as (set 1 for testing)
+    * On load balancer set application load balancer, select `create a new load balancer`, set the load balancer name, create a new listener and set port 80, create a new target group, set name, set health check url (in my case i use `/login`) 
+    * In networking tab create a new `Security Group` for example name `vproapp-ecs-sg` and add rules for example protocol:http, source:anywhere and click on "Create" button and wait some time for creation. 
+    * Now goto "EC2 > Target group" and check for the health of created  service, which shows unhealthy service, then goto "Health checks" tab and edit the configuration, expand "Advanced health check settings" and override the port according to the service running on your container and adjust the "health threshold" (set it 2) and "Save the changes".    
+    * Now goto seucirty group and modify inbound rules to allow port 8080 from anywhere for both ipv4/ipv6. 
+    * Now goto target group and check the health, if the service is healthy then you can access the service by "ECS > clusters > cluster_name > services tab" click on running service and click on networking tab, here in DNS section you will find the url of load balancer to access the site/service. Also remember the service is running on port 8080 but the load balancer is listening on port 80, so you can access the service on port 80.  
+    * To get the direct ip of service goto "ECS > clusters > cluster_name > tasks tab", then click on the running tasks and on the cionfiguration section you will find the public ip of that container.  
+
+
+__Steps to add ECS service automation in Jenkinsfile__     
+
+1. Set environment variable on Jenkinsfile  
+
+```   
+environment {
+    cluster = ""
+    service = ""
+}  
+```   
+
+For that we have to create ECS cluster and ECS service  
+
+2. Add code on Jenkinsfile to deploy the image from ecr into ecs
+
+```
+stage('Deploy to ECS') {
+    steps {
+        withAWS(credentials: 'awscreds', region: 'us-east-2') {
+            sh 'aws ecs update-service --cluster ${cluster} --service ${service} --force-new-deployment'
+        }
+    }
+}
+```
+
+> Note: We also need to install a plugin "Pipeline: AWS Steps"    
 
 
